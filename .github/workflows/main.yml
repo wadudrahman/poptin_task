@@ -1,4 +1,4 @@
-name: Damp Sauna Staging CI/CD
+name: Target Rules App CI/CD
 
 on:
   push:
