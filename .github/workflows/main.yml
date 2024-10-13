@@ -1,0 +1,47 @@
+name: Damp Sauna Staging CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Copy file via scp
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          port: ${{ secrets.PORT }}
+          password: ${{ secrets.PASSWORD }}
+          source: "."
+          target: ${{ secrets.DIR }}
+
+      - name: executing laravel deployement commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          port: ${{ secrets.PORT }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd ${{ secrets.DIR }}
+            echo "creating env file..."
+            php -r "file_exists('.env') || copy('.env.example', '.env');"
+            echo "executing composer install..."
+            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+            echo "executing composer dump-autoload..."
+            composer dump-autoload --no-interaction
+            echo "Optimize clear..."
+            php artisan optimize:clear
+            echo "Granting directory permissions..."
+            chmod -R 777 bootstrap/
+            chmod -R 777 storage/
+            chmod -R 777 public/
+            npm run build
+            echo "done..."
