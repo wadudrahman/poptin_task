@@ -38,13 +38,13 @@ class DynamicScriptController extends Controller
     {
         switch ($rule->condition) {
             case 'contains':
-                return "if (currentUrl.includes('{$rule->url_part}')) { shouldShowAlert = true; }";
+                return "if (currentUrl.includes('{$rule->url}')) { shouldShowAlert = true; }";
             case 'starts_with':
-                return "if (currentUrl.startsWith('{$rule->url_part}')) { shouldShowAlert = true; }";
+                return "if (currentUrl.startsWith('{$rule->url}')) { shouldShowAlert = true; }";
             case 'ends_with':
-                return "if (currentUrl.endsWith('{$rule->url_part}')) { shouldShowAlert = true; }";
+                return "if (currentUrl.endsWith('{$rule->url}')) { shouldShowAlert = true; }";
             case 'exact':
-                return "if (currentUrl === '{$rule->url_part}') { shouldShowAlert = true; }";
+                return "if (currentUrl === '{$rule->url}') { shouldShowAlert = true; }";
             default:
                 return "";
         }
