@@ -289,6 +289,16 @@
             addRuleRow();
         });
 
+        // Attach Delete Listeners to Existing Rows on Page Load
+        function attachDeleteListeners() {
+            document.querySelectorAll('.delete-row-btn').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    deleteRuleRow(this);
+                });
+            });
+        }
+
         // Event Listener to Delete on Page Load
         document.querySelectorAll('.delete-row-btn').forEach(function (btn) {
             btn.addEventListener('click', function (e) {
