@@ -11,9 +11,6 @@ class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Test login page display.
-     */
     public function test_show_login_page(): void
     {
         $response = $this->get(route('showLogin'));
@@ -22,9 +19,6 @@ class AuthControllerTest extends TestCase
         $response->assertViewIs('login');
     }
 
-    /**
-     * Test valid login credentials.
-     */
     public function test_user_can_login_with_valid_credentials(): void
     {
         $user = User::factory()->create([
@@ -41,9 +35,6 @@ class AuthControllerTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    /**
-     * Test invalid login credentials.
-     */
     public function test_user_cannot_login_with_invalid_credentials(): void
     {
         $user = User::factory()->create([
@@ -61,9 +52,6 @@ class AuthControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    /**
-     * Test registration page display.
-     */
     public function test_show_registration_page(): void
     {
         $response = $this->get(route('showRegister'));
@@ -72,9 +60,6 @@ class AuthControllerTest extends TestCase
         $response->assertViewIs('register');
     }
 
-    /**
-     * Test valid user registration.
-     */
     public function test_user_can_register_with_valid_data(): void
     {
         $response = $this->post(route('register'), [
@@ -92,9 +77,6 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * Test registration fails with invalid data.
-     */
     public function test_registration_fails_with_invalid_data(): void
     {
         $response = $this->post(route('register'), [
@@ -107,9 +89,6 @@ class AuthControllerTest extends TestCase
         $response->assertSessionHasErrors(['name', 'email', 'password']);
     }
 
-    /**
-     * Test registration fails if email already taken.
-     */
     public function test_registration_fails_if_email_already_exists(): void
     {
         User::factory()->create([
