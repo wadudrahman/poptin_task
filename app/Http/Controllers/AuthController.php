@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\{Auth, DB, Hash, Log};
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Http\{RedirectResponse, Request};
 
@@ -75,5 +76,19 @@ class AuthController extends Controller
         }
 
         return redirect()->route('showRegister')->with('failure', 'Account creation failed.');
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        // Logout
+        Auth::logout();
+
+        // Invalid Session
+        $request->session()->invalidate();
+
+        // Regenerate CSRF
+        $request->session()->regenerateToken();
+
+        return redirect()->route('showLogin')->with('success', 'You have been logged out successfully.');
     }
 }

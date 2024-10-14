@@ -17,7 +17,7 @@
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <a href="./sign-in.html" class="dropdown-item">Logout</a>
+                    <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
                 </div>
             </div>
         </div>
