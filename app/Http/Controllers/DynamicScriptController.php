@@ -45,6 +45,8 @@ class DynamicScriptController extends Controller
                 return "if (currentUrl.endsWith('{$rule->url_part}')) { shouldShowAlert = true; }";
             case 'exact':
                 return "if (currentUrl === '{$rule->url_part}') { shouldShowAlert = true; }";
+            default:
+                return "";
         }
     }
 }
