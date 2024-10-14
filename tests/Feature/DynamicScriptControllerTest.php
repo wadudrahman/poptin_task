@@ -3,21 +3,21 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\Rule; // Assuming you have a Rule model for the rules
+use App\Models\Rule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class DynamicScriptControllerTest extends TestCase
 {
-    use RefreshDatabase; // Use this trait to reset the database after each test
+    use RefreshDatabase;
 
     /** @test */
     public function it_serves_dynamic_script_for_user_with_rules()
     {
         // Create a user with rules
         $user = User::factory()->create([
-            'message' => 'Hello World!', // Example alert message
+            'message' => 'Hello World!',
         ]);
 
         $rule1 = Rule::create([
@@ -32,7 +32,7 @@ class DynamicScriptControllerTest extends TestCase
             'condition' => 'starts_with',
         ]);
 
-        // Make a request to the serveDynamicScript method
+        // Make a request
         $response = $this->get(route('serveDynamicScript', ['userId' => $user->id]));
 
         // Assert the response status is OK
