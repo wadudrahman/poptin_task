@@ -49,25 +49,22 @@ class DynamicScriptController extends Controller
         $js .= "
             if (!shouldHideAlert && shouldShowAlert) {
                 alert(" . json_encode($alertText) . ");
-            } else {
-                console.log('Alert not shown due to hide rule or no show rule matched.');
             }
-        };
-        ";
+        };";
 
         return response($js, 200)->header('Content-Type', 'application/javascript');
     }
 
-    private function generateShowRuleJs($rule, $firstWordVar, $lastWordVar, $exactPathVar)
+    private function generateShowRuleJs($rule, $firstWordVar, $lastWordVar, $exactPathVar): string
     {
         $url = json_encode($rule->url);
         switch ($rule->condition) {
             case 'contains':
                 return "if (currentPath.includes($url)) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Contains $url'); }\n";
             case 'starts_with':
-                return "if ($firstWordVar === $url) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Starts With $url'); }\n";
+                return "if ($firstWordVar === $url || firstWord.includes($url)) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Starts With $url'); }\n";
             case 'ends_with':
-                return "if ($lastWordVar === $url) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Ends With $url'); }\n";
+                return "if ($lastWordVar === $url || lastWord.endsWith($url)) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Ends With $url'); }\n";
             case 'exact':
                 return "if ($exactPathVar === $url) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Exact $url'); }\n";
             default:
@@ -75,16 +72,16 @@ class DynamicScriptController extends Controller
         }
     }
 
-    private function generateHideRuleJs($rule, $firstWordVar, $lastWordVar, $exactPathVar)
+    private function generateHideRuleJs($rule, $firstWordVar, $lastWordVar, $exactPathVar): string
     {
         $url = json_encode($rule->url);
         switch ($rule->condition) {
             case 'contains':
                 return "if (currentPath.includes($url)) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Contains $url'); }\n";
             case 'starts_with':
-                return "if ($firstWordVar === $url) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Starts With $url'); }\n";
+                return "if ($firstWordVar === $url || firstWord.includes($url)) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Starts With $url'); }\n";
             case 'ends_with':
-                return "if ($lastWordVar === $url) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Ends With $url'); }\n";
+                return "if ($lastWordVar === $url || lastWord.endsWith($url)) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Ends With $url'); }\n";
             case 'exact':
                 return "if ($exactPathVar === $url) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Exact $url'); }\n";
             default:

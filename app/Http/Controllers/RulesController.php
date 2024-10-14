@@ -66,7 +66,7 @@ class RulesController extends Controller implements HasMiddleware
                 $userData->rules()->create([
                     'action' => $action,
                     'condition' => $validatedData['rule'][$index],
-                    'url' => $validatedData['url'][$index]
+                    'url' => trim($validatedData['url'][$index], "/")
                 ]);
             }
 
