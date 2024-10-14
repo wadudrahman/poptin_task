@@ -209,7 +209,7 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        &lt;script src="{{ env('APP_URL') }}/script/dynamic/{{ auth()->user()->id }}"&gt;&lt;/script&gt;
+                        &lt;script src="{{ config('app.url') }}/script/dynamic/{{ auth()->user()->id }}"&gt;&lt;/script&gt;
                     </p>
                 </div>
             </div>
