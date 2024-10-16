@@ -32,7 +32,7 @@ class RulesController extends Controller implements HasMiddleware
         // Validation Rules
         $validatedData = $request->validated();
 
-        // Define Alert Params
+        // Default operation status and message
         $operationStatus = 'success';
         $operationMessage = 'Rules saved successfully!';
 
@@ -40,40 +40,58 @@ class RulesController extends Controller implements HasMiddleware
             // Retrieve User Data
             $userData = auth()->user();
 
-            // Delete Existing Rules
-            $userData->rules()->delete();
-
-            // DB Transaction
+            // Start a DB transaction
             DB::beginTransaction();
 
-            $data = [];
+            $newRulePool = [];
 
-            // Save Rules @ DB
+            // Prepare the data and either update or create the rules
             foreach ($validatedData['action'] as $index => $action) {
-                $userData->rules()->create([
+                // Update Existing Rule
+                if (isset($validatedData['uuid'][$index])) {
+                    $userData->rules()->where('uuid', trim($validatedData['uuid'][$index]))
+                        ->update([
+                            'action' => $action,
+                            'condition' => $validatedData['rule'][$index],
+                            'url' => trim($validatedData['url'][$index], "/")
+                        ]);
+
+                    continue;
+                }
+
+                // Create New Rule
+                $newRulePool[] = [
                     'uuid' => Uuid::uuid4()->toString(),
+                    'user_id' => $userData->id,
                     'action' => $action,
                     'condition' => $validatedData['rule'][$index],
                     'url' => trim($validatedData['url'][$index], "/")
-                ]);
+                ];
             }
 
-            // Save Message @ DB
-            $userData->update(['message' => trim($validatedData['message'])]);
+            // Insert New Rule Pool
+            if (!empty($newRulePool)) {
+                Rule::query()->insert($newRulePool);
+            }
 
-            // Persist DB Changes
+            // Update Message
+            if ($userData->message != trim($validatedData['message'])) {
+                $userData->update(['message' => trim($validatedData['message'])]);
+            }
+
+            // Commit the DB transaction
             DB::commit();
         } catch (\Exception $exception) {
-            // Rollback DB Changes
+            // Rollback the DB transaction if something goes wrong
             DB::rollBack();
 
-            // Log Error
-            Log::error('Error while storing rule: ' . $exception->getMessage(), [
+            // Log the exception with detailed error information
+            Log::error('Error while storing rules: ' . $exception->getMessage(), [
                 'file' => $exception->getFile(),
-                'line' => $exception->getLine()
+                'line' => $exception->getLine(),
             ]);
 
-            // Update Operation Status and Message
+            // Update operation status and message
             $operationStatus = 'failure';
             $operationMessage = 'Rules saving failed!';
         }

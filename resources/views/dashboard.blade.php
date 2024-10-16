@@ -59,6 +59,7 @@
                                     <table class="table mb-0" id="rulesTable">
                                         <thead>
                                         <tr>
+                                            <th style="display: none;"><label class="form-label">UUID</label></th>
                                             <th><label class="form-label required">Action</label></th>
                                             <th><label class="form-label required">Condition</label></th>
                                             <th><label class="form-label required">URL Pattern</label></th>
@@ -68,6 +69,7 @@
                                         <tbody>
                                         @if($rules->isEmpty())
                                             <tr>
+                                                <td style="display: none;"></td>
                                                 <td>
                                                     <select class="form-select" name="action[]">
                                                         <option disabled selected>Select Action</option>
@@ -123,6 +125,10 @@
                                         @else
                                             @foreach($rules as $rule)
                                                 <tr>
+                                                    <td style="display: none;">
+                                                        <input type="hidden" class="form-control" name="uuid[]"
+                                                               value="{{ $rule->uuid }}" autocomplete="off">
+                                                    </td>
                                                     <td>
                                                         <select class="form-select" name="action[]">
                                                             <option disabled
@@ -250,6 +256,7 @@
 
             // Set Inner HTML for Row
             newRow.innerHTML = `
+                <td style="display: none;"></td>
                 <td>
                     <select class="form-select" name="action[]">
                         <option disabled selected>Select Action</option>

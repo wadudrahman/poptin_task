@@ -2,27 +2,21 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
+use Ramsey\Uuid\Uuid;
 
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    public function definition()
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'password' => static::$password ??= Hash::make('password')
+            'uuid' => Uuid::uuid4()->toString(),
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
+            'password' => bcrypt('password'),
         ];
     }
 }

@@ -23,6 +23,7 @@ class StoreRulesRequest extends FormRequest
     {
         return [
             'message' => 'required|string|max:255',
+            'uuid.*' => 'nullable|string|exists:rules,uuid',
             'action.*' => 'required|in:show,hide',
             'rule.*' => 'required|in:contains,starts_with,ends_with,exact',
             'url.*' => 'required|string|max:255',
