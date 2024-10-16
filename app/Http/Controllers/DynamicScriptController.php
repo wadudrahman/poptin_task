@@ -37,13 +37,7 @@ class DynamicScriptController extends Controller
             }
 
             var shouldShowAlert = false;
-            var shouldHideAlert = false;
         ";
-
-        // Generate JS for hide rules
-        foreach ($hideRules as $rule) {
-            $js .= $this->generateHideRuleJs($rule, 'firstWord', 'lastWord', 'exactPath');
-        }
 
         // Generate JS for show rules
         foreach ($showRules as $rule) {
@@ -51,7 +45,7 @@ class DynamicScriptController extends Controller
         }
 
         $js .= "
-            if (!shouldHideAlert && shouldShowAlert) {
+            if (shouldShowAlert) {
                 alert(" . json_encode($alertText) . ");
             }
         };";
@@ -71,23 +65,6 @@ class DynamicScriptController extends Controller
                 return "if ($lastWordVar === $url || lastWord.endsWith($url)) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Ends With $url'); }\n";
             case 'exact':
                 return "if ($exactPathVar === $url) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Exact $url'); }\n";
-            default:
-                return "";
-        }
-    }
-
-    private function generateHideRuleJs($rule, $firstWordVar, $lastWordVar, $exactPathVar): string
-    {
-        $url = json_encode($rule->url);
-        switch ($rule->condition) {
-            case 'contains':
-                return "if (currentPath.includes($url)) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Contains $url'); }\n";
-            case 'starts_with':
-                return "if ($firstWordVar === $url || firstWord.includes($url)) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Starts With $url'); }\n";
-            case 'ends_with':
-                return "if ($lastWordVar === $url || lastWord.endsWith($url)) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Ends With $url'); }\n";
-            case 'exact':
-                return "if ($exactPathVar === $url) { shouldHideAlert = true; console.log('Hide Alert Rule Matched: Exact $url'); }\n";
             default:
                 return "";
         }
