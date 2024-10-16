@@ -45,7 +45,7 @@
             <div class="row row-cards">
                 <div class="col-12">
                     <div class="card">
-                        <form action="{{ route('storeRules') }}" method="POST">
+                        <form action="{{ route('storeRules') }}" method="POST" id="rulesForm">
                             @csrf
                             <div class="card-body">
                                 <div class="row row-cards">
@@ -329,7 +329,7 @@
                         } else {
                             return response.json().then(data => {
                                 responseMessageDiv.style.display = 'block';
-                                responseMessageDiv.className = 'alert alert-success alert-dismissible fade show';
+                                responseMessageDiv.className = 'alert alert-danger alert-dismissible fade show';
                                 responseMessageDiv.innerHTML = `<span>${data.message || 'Failed to delete the rule.'}</span>
                     <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>`;
                             });
@@ -337,8 +337,8 @@
                     }).catch(error => {
                         const responseMessageDiv = document.getElementById('responseMessage');
                         responseMessageDiv.style.display = 'block';
-                        responseMessageDiv.className = 'alert alert-success alert-dismissible fade show';
-                        responseMessageDiv.textContent = `<span>'An error occurred while processing the request.'</span>
+                        responseMessageDiv.className = 'alert alert-info alert-dismissible fade show';
+                        responseMessageDiv.innerHTML = `<span>'An error occurred while processing the request.'</span>
                         <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>`;
                     });
                 } else {
@@ -365,6 +365,79 @@
                 alert('Failed to copy the script. Please try again.');
             });
         });
+
+        // Validate Before Submitting
+        document.getElementById('rulesForm').addEventListener('submit', function (e) {
+            // Get Actions, Rules and URLs
+            const actions = document.querySelectorAll('select[name="action[]"]');
+            const rules = document.querySelectorAll('select[name="rule[]"]');
+            const urls = document.querySelectorAll('input[name="url[]"]');
+            let isValid = true;
+            let isDuplicate = false;
+            const configurations = new Set();
+
+            // Validate Action, Rule and Url
+            actions.forEach((action, index) => {
+                const rule = rules[index];
+                const url = urls[index];
+
+                // Validate Action
+                if (!action.value || action.value === 'Select Action') {
+                    isValid = false;
+                    action.classList.add('is-invalid');
+                } else {
+                    action.classList.remove('is-invalid');
+                }
+
+                // Validate Rule
+                if (!rule.value || rule.value === 'Select Rule') {
+                    isValid = false;
+                    rule.classList.add('is-invalid');
+                } else {
+                    rule.classList.remove('is-invalid');
+                }
+
+                // Validate URL
+                if (!url.value.trim()) {
+                    isValid = false;
+                    url.classList.add('is-invalid');
+                } else {
+                    url.classList.remove('is-invalid');
+                }
+
+                // Create a Unique Combination
+                const combination = `${action.value}|${rule.value}|${url.value.trim()}`;
+
+                // Check If Combination Already Exists
+                if (configurations.has(combination)) {
+                    isValid = false;
+                    isDuplicate = true;
+
+                    // Highlight Duplicate
+                    action.classList.add('is-invalid');
+                    rule.classList.add('is-invalid');
+                    url.classList.add('is-invalid');
+                } else {
+                    // Add Combination to Set
+                    configurations.add(combination);
+                }
+            });
+
+            // Prevent Submit
+            if (!isValid) {
+                e.preventDefault();
+                let messageText = !isDuplicate ? 'Please fill all the required fields before submitting.' :
+                    'Duplicate configuration found.';
+
+                const responseMessageDiv = document.getElementById('responseMessage');
+                responseMessageDiv.style.display = 'block';
+                responseMessageDiv.className = 'alert alert-info alert-dismissible fade show';
+                responseMessageDiv.innerHTML = `<span>${messageText}</span>
+    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>`;
+            }
+        });
+
+
 
     </script>
 @endpush
