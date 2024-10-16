@@ -14,17 +14,13 @@ return new class extends Migration
     {
         if (Schema::hasTable('rules') && !Schema::hasColumn('rules', 'uuid')) {
             Schema::table('rules', function (Blueprint $table) {
-                $table->string('uuid')->nullable()->after('id')->index();
+                $table->string('uuid', 36)->nullable()->after('id')->index();
+                $table->unique('uuid');
             });
 
             // Update Existing Records
             DB::table('rules')->get()->each(function ($rule) {
                 DB::table('rules') ->where('id', $rule->id)->update(['uuid' => Uuid::uuid4()->toString()]);
-            });
-
-            // Unique Constraint
-            Schema::table('rules', function (Blueprint $table) {
-                $table->unique('uuid');
             });
         }
     }
@@ -36,6 +32,7 @@ return new class extends Migration
     {
         if (Schema::hasTable('rules') && Schema::hasColumn('rules', 'uuid')) {
             Schema::table('rules', function (Blueprint $table) {
+                $table->dropUnique(['uuid']);
                 $table->dropColumn('uuid');
             });
         }

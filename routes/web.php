@@ -18,5 +18,6 @@ Route::group(['prefix' => 'rules'], function () {
 });
 
 // Dynamic Script
-Route::get('/script/dynamic/{userUuid}', [DynamicScriptController::class, 'serveDynamicScript']);
+Route::get('/script/dynamic/{userUuid}', [DynamicScriptController::class, 'serveDynamicScript'])
+    ->where('userUuid', '[0-9a-fA-F\-]{36}');
 

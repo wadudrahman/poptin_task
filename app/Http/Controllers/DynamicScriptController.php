@@ -2,71 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\{JsonResponse, Response};
+use Ramsey\Uuid\Uuid;
 
 class DynamicScriptController extends Controller
 {
-    public function serveDynamicScript(string $userUuid): Response
+    public function serveDynamicScript(string $userUuid): Response|JsonResponse
     {
-        // Fetch user data with rules
-        $userData = User::query()->with('rules')
-            ->where('uuid', $userUuid)
-            ->firstOrFail();
-
-        // Slice Rules and Message
-        $rules = $userData->rules;
-        $alertText = $userData->message;
-
-        // Separate rules into show and hide
-        $showRules = $rules->where('action', 'show');
-        $hideRules = $rules->where('action', 'hide');
-
-        // JS Logic
-        $js = "
-        window.onload = function() {
-            var currentPath = window.location.pathname;
-            var pathSegments = currentPath.split('/').filter(Boolean);
-            var firstWord = pathSegments[0] || '';
-            var lastWord = pathSegments[pathSegments.length - 1] || '';
-            var exactPath = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath;
-
-            // Remove trailing slash if present
-            if (exactPath.endsWith('/')) {
-                exactPath = exactPath.slice(0, -1);
-            }
-
-            var shouldShowAlert = false;
-        ";
-
-        // Generate JS for show rules
-        foreach ($showRules as $rule) {
-            $js .= $this->generateShowRuleJs($rule, 'firstWord', 'lastWord', 'exactPath');
+        // Validate UUID
+        if(!Uuid::isValid(trim($userUuid)) || !Cache::has($userUuid)) {
+            return response()->json([
+                'message' => 'Invalid user uuid given.'
+            ], 400);
         }
 
-        $js .= "
-            if (shouldShowAlert) {
-                alert(" . json_encode($alertText) . ");
-            }
-        };";
+        // Retrieve Script from Cache
+        $script = Cache::get($userUuid);
 
-        return response($js, 200)->header('Content-Type', 'application/javascript');
-    }
-
-    private function generateShowRuleJs($rule, $firstWordVar, $lastWordVar, $exactPathVar): string
-    {
-        $url = json_encode($rule->url);
-        switch ($rule->condition) {
-            case 'contains':
-                return "if (currentPath.includes($url)) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Contains $url'); }\n";
-            case 'starts_with':
-                return "if ($firstWordVar === $url || firstWord.includes($url)) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Starts With $url'); }\n";
-            case 'ends_with':
-                return "if ($lastWordVar === $url || lastWord.endsWith($url)) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Ends With $url'); }\n";
-            case 'exact':
-                return "if ($exactPathVar === $url) { shouldShowAlert = true; console.log('Show Alert Rule Matched: Exact $url'); }\n";
-            default:
-                return "";
-        }
+        return response($script, 200)->header('Content-Type', 'application/javascript');
     }
 }
