@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRulesRequest;
+use App\Jobs\CacheScript;
 use App\Models\Rule;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
@@ -81,6 +82,9 @@ class RulesController extends Controller implements HasMiddleware
 
             // Commit the DB transaction
             DB::commit();
+
+            // Dispatch Generate Script
+            CacheScript::dispatch($userData->uuid);
         } catch (\Exception $exception) {
             // Rollback the DB transaction if something goes wrong
             DB::rollBack();
