@@ -2,32 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use App\Http\Requests\{LoginCredentialRequest, UserRegistrationRequest};
 use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\{Auth, DB, Hash, Log};
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\{Auth, Hash, Log};
+use Ramsey\Uuid\Uuid;
 use Illuminate\Http\{RedirectResponse, Request};
 
-class AuthController extends Controller
+class AuthController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth', ['logout']),
+        ];
+    }
+
     public function showLogin(): View
     {
         return view('login');
     }
 
-    public function login(Request $request): RedirectResponse
+    public function login(LoginCredentialRequest $request): RedirectResponse
     {
         // Validation Rules
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+        $validatedData = $request->validated();
 
         try {
             // Credentials Check
-            if(Auth::attempt($validatedData))
-            {
+            if (Auth::attempt($validatedData)) {
                 $request->session()->regenerate();
                 return redirect()->route('dashboard');
             }
@@ -47,24 +51,19 @@ class AuthController extends Controller
         return view('register');
     }
 
-    public function register(Request $request): RedirectResponse
+    public function register(UserRegistrationRequest $request): RedirectResponse
     {
         // Validation Rules
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => ['required', Password::min(8)]
-        ]);
+        $validatedData = $request->validated();
 
         try {
             // DB Operation
-            DB::transaction(function () use ($validatedData) {
-                User::query()->create([
-                    'name' => ucwords(trim($validatedData['name'])),
-                    'email' => trim($validatedData['email']),
-                    'password' => Hash::make(trim($validatedData['password']))
-                ]);
-            });
+            User::query()->create([
+                'uuid' => Uuid::uuid4(),
+                'name' => ucwords(trim($validatedData['name'])),
+                'email' => trim($validatedData['email']),
+                'password' => Hash::make(trim($validatedData['password']))
+            ]);
 
             return redirect()->route('showLogin')->with('success', 'Account created successfully.');
         } catch (\Exception $exception) {
@@ -83,10 +82,8 @@ class AuthController extends Controller
         // Logout
         Auth::logout();
 
-        // Invalid Session
+        // Invalid And Regenerate Session Token
         $request->session()->invalidate();
-
-        // Regenerate CSRF
         $request->session()->regenerateToken();
 
         return redirect()->route('showLogin')->with('success', 'You have been logged out successfully.');

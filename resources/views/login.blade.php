@@ -42,15 +42,21 @@
                     @csrf
                     <div class="mb-3">
                         <label class="form-label required">Email address</label>
-                        <input type="email" class="form-control" name="email" placeholder="your@email.com"
-                               autocomplete="off" required>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
+                               placeholder="your@email.com" value="{{ old('email') }}" autocomplete="off" required>
+                        @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-2">
                         <label class="form-label required">Password</label>
                         <div class="input-group input-group-flat">
-                            <input type="password" class="form-control" name="password" placeholder="Your password"
-                                   autocomplete="off" required>
+                            <input type="password" class="form-control  @error('password') is-invalid @enderror"
+                                   name="password" placeholder="Your password" autocomplete="off" required>
                         </div>
+                        @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-footer">
                         <button type="submit" class="btn btn-primary w-100">Sign in</button>

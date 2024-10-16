@@ -17,5 +17,5 @@ Route::group(['prefix' => 'rules'], function () {
 });
 
 // Dynamic Script
-Route::get('/script/dynamic/{userId}', [DynamicScriptController::class, 'serveDynamicScript']);
+Route::get('/script/dynamic/{userUuid}', [DynamicScriptController::class, 'serveDynamicScript']);
 

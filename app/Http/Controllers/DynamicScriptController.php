@@ -7,10 +7,14 @@ use Illuminate\Http\Response;
 
 class DynamicScriptController extends Controller
 {
-    public function serveDynamicScript(string $userId): Response
+    public function serveDynamicScript(string $userUuid): Response
     {
         // Fetch user data with rules
-        $userData = User::query()->with('rules')->findOrFail($userId);
+        $userData = User::query()->with('rules')
+            ->where('uuid', $userUuid)
+            ->firstOrFail();
+
+        // Slice Rules and Message
         $rules = $userData->rules;
         $alertText = $userData->message;
 
