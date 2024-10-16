@@ -119,6 +119,8 @@ class RulesController extends Controller implements HasMiddleware
             $status = $deleted ? 200 : 404;
             $message = $deleted ? 'The rule deleted successfully.' : 'The rule not found or you do not own the rule.';
 
+            // Dispatch Generate Script
+            CacheScript::dispatch($userData->uuid);
         } catch (\Exception $exception) {
             // Log Error
             Log::error('Error while storing rule: ' . $exception->getMessage(), [
