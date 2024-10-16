@@ -35,6 +35,9 @@
                 <div class="col-12">
                     @include('partials.alert')
                 </div>
+                <div class="col-12">
+                    <div id="responseMessage" class="alert" style="display: none;"></div>
+                </div>
             </div>
             <div class="row row-cards">
                 <div class="col-12">
@@ -50,7 +53,7 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <table class="table mb-0">
+                                    <table class="table mb-0" id="rulesTable">
                                         <thead>
                                         <tr>
                                             <th><label class="form-label required">Action</label></th>
@@ -97,12 +100,13 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a href="#" class="btn btn-icon btn-google w-100 text-center">
+                                                    <button type="button"
+                                                            class="btn btn-icon btn-google w-100 text-center delete-row-btn">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                              viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                              stroke-width="2" stroke-linecap="round"
                                                              stroke-linejoin="round"
-                                                             class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                                                             class="icon icon-tabler icon-tabler-trash">
                                                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                             <path d="M4 7l16 0"/>
                                                             <path d="M10 11l0 6"/>
@@ -110,7 +114,7 @@
                                                             <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
                                                             <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
                                                         </svg>
-                                                    </a>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         @else
@@ -164,13 +168,15 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <a href="#" class="btn btn-icon btn-google w-100 text-center">
+                                                        <button type="button"
+                                                                class="btn btn-icon btn-google w-100 text-center delete-row-btn"
+                                                                data-rule-id="{{ $rule->uuid }}">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                                  height="24"
                                                                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                                  stroke-width="2" stroke-linecap="round"
                                                                  stroke-linejoin="round"
-                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                                                                 class="icon icon-tabler icon-tabler-trash">
                                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                                 <path d="M4 7l16 0"/>
                                                                 <path d="M10 11l0 6"/>
@@ -179,7 +185,7 @@
                                                                     d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
                                                                 <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
                                                             </svg>
-                                                        </a>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -190,7 +196,7 @@
                             </div>
                             <div class="card-footer text-end">
                                 <div class="d-flex">
-                                    <button type="submit" class="btn btn-secondary">Add Rule</button>
+                                    <button type="button" class="btn btn-secondary" id="addRuleBtn">Add Rule</button>
                                     <button type="submit" class="btn btn-primary ms-auto">Submit</button>
                                 </div>
                             </div>
@@ -222,89 +228,114 @@
         // Function to Add New Rule
         function addRuleRow() {
             // Get Table Body Element
-            const tableBody = document.querySelector('table tbody');
+            const tableBody = document.querySelector('#rulesTable tbody');
 
             // Create New Row
             const newRow = document.createElement('tr');
 
             // Set Inner HTML for Row
             newRow.innerHTML = `
-        <td>
-            <select class="form-select" name="action[]">
-                <option disabled selected>Select Action</option>
-                <option value="show">Show On</option>
-                <option value="hide">Don't Show On</option>
-            </select>
-        </td>
-        <td>
-            <select class="form-select" name="rule[]">
-                <option disabled selected>Select Rule</option>
-                <option value="contains">Pages That Contains</option>
-                <option value="exact">A Specific Page</option>
-                <option value="starts_with">Pages Starting With</option>
-                <option value="ends_with">Pages Ending With</option>
-            </select>
-        </td>
-        <td>
-            <div class="input-group mb-2">
-                <span class="input-group-text"><b>www.domain.com/</b></span>
-                <input type="text" class="form-control" name="url[]" autocomplete="off">
-            </div>
-        </td>
-        <td>
-            <a href="#" class="btn btn-icon btn-google w-100 text-center delete-row-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M4 7l16 0"/>
-                    <path d="M10 11l0 6"/>
-                    <path d="M14 11l0 6"/>
-                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                </svg>
-            </a>
-        </td>
-    `;
+                <td>
+                    <select class="form-select" name="action[]">
+                        <option disabled selected>Select Action</option>
+                        <option value="show">Show On</option>
+                        <option value="hide">Don't Show On</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" name="rule[]">
+                        <option disabled selected>Select Rule</option>
+                        <option value="contains">Pages That Contains</option>
+                        <option value="exact">A Specific Page</option>
+                        <option value="starts_with">Pages Starting With</option>
+                        <option value="ends_with">Pages Ending With</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text"><b>www.domain.com/</b></span>
+                        <input type="text" class="form-control" name="url[]" autocomplete="off">
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-icon btn-google w-100 text-center delete-row-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="icon icon-tabler icon-tabler-trash">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M4 7l16 0"/>
+                            <path d="M10 11l0 6"/>
+                            <path d="M14 11l0 6"/>
+                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                        </svg>
+                    </button>
+                </td>
+            `;
 
             // Append the Row
             tableBody.appendChild(newRow);
+        }
 
-            // Event Listener to Delete
-            newRow.querySelector('.delete-row-btn').addEventListener('click', function (e) {
+        // Event Delegation for Deleting Rows
+        document.querySelector('#rulesTable tbody').addEventListener('click', function (e) {
+            if (e.target.closest('.delete-row-btn')) {
                 e.preventDefault();
-                deleteRuleRow(this);
-            });
-        }
+                const button = e.target.closest('.delete-row-btn');
+                const row = button.closest('tr');
+                const ruleUuid = button.getAttribute('data-rule-id');
 
-        // Delete Row
-        function deleteRuleRow(element) {
-            const row = element.closest('tr');
-            row.remove();
-        }
+                // If Rules is Stored, Then Call Delete Route and Remove Row, Otherwise Remove Row
+                if (ruleUuid) {
+                    // Define Route
+                    let deleteRuleUrl = "{{ route('destroyRule', ':uuid') }}";
 
-        // Event Listener to Add Rule
-        document.querySelector('.btn-secondary').addEventListener('click', function (e) {
-            e.preventDefault();
-            addRuleRow();
+                    // Ajax Call
+                    fetch(deleteRuleUrl.replace(':uuid', ruleUuid), {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(response => {
+                        const responseMessageDiv = document.getElementById('responseMessage');
+
+                        // Check if the response was successful (status code 200–299)
+                        if (response.ok) {
+                            return response.json().then(data => {
+                                // Remove Row
+                                row.remove();
+
+                                responseMessageDiv.style.display = 'block';
+                                responseMessageDiv.className = 'alert alert-success alert-dismissible fade show';
+                                responseMessageDiv.innerHTML = `<span>${data.message || 'Rule deleted successfully.'}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>`;
+                            });
+                        } else {
+                            return response.json().then(data => {
+                                responseMessageDiv.style.display = 'block';
+                                responseMessageDiv.className = 'alert alert-success alert-dismissible fade show';
+                                responseMessageDiv.innerHTML = `<span>${data.message || 'Failed to delete the rule.'}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>`;
+                            });
+                        }
+                    }).catch(error => {
+                        const responseMessageDiv = document.getElementById('responseMessage');
+                        responseMessageDiv.style.display = 'block';
+                        responseMessageDiv.className = 'alert alert-success alert-dismissible fade show';
+                        responseMessageDiv.textContent = `<span>'An error occurred while processing the request.'</span>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>`;
+                    });
+                } else {
+                    row.remove();
+                }
+            }
         });
 
-        // Attach Delete Listeners to Existing Rows on Page Load
-        function attachDeleteListeners() {
-            document.querySelectorAll('.delete-row-btn').forEach(function (btn) {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    deleteRuleRow(this);
-                });
-            });
-        }
-
-        // Event Listener to Delete on Page Load
-        document.querySelectorAll('.delete-row-btn').forEach(function (btn) {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                deleteRuleRow(this);
-            });
+        // Add Rule Button Listener
+        document.getElementById('addRuleBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            addRuleRow();
         });
     </script>
 @endpush

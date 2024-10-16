@@ -59,7 +59,7 @@ class AuthController extends Controller implements HasMiddleware
         try {
             // DB Operation
             User::query()->create([
-                'uuid' => Uuid::uuid4(),
+                'uuid' => Uuid::uuid4()->toString(),
                 'name' => ucwords(trim($validatedData['name'])),
                 'email' => trim($validatedData['email']),
                 'password' => Hash::make(trim($validatedData['password']))

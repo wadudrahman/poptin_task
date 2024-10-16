@@ -14,6 +14,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::group(['prefix' => 'rules'], function () {
     Route::get('/dashboard', [RulesController::class, 'showDashboard'])->name('dashboard');
     Route::post('/store', [RulesController::class, 'storeRules'])->name('storeRules');
+    Route::delete('/destroy/{uuid}', [RulesController::class, 'destroyRule'])->name('destroyRule');
 });
 
 // Dynamic Script

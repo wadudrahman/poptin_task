@@ -14,6 +14,6 @@ class Rule extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'user_id', 'action', 'condition', 'url'
+       'uuid', 'user_id', 'action', 'condition', 'url'
     ];
 }
