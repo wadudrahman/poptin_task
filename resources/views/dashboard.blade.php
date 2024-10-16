@@ -12,10 +12,13 @@
                        data-bs-toggle="modal" data-bs-target="#showScript">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                             class="icon icon-tabler icons-tabler-outline icon-tabler-box-multiple">
+                             class="icon icon-tabler icons-tabler-outline icon-tabler-eye-code">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M7 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/>
-                            <path d="M17 17v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2"/>
+                            <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
+                            <path
+                                d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008"/>
+                            <path d="M20 21l2 -2l-2 -2"/>
+                            <path d="M17 17l-2 2l2 2"/>
                         </svg>
                         Show Script Code
                     </a>
@@ -214,9 +217,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>
+                    <p id="generatedScript">
                         &lt;script src="{{ config('app.url') }}/script/dynamic/{{ auth()->user()->uuid }}"&gt;&lt;/script&gt;
                     </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-dark ms-auto" id="copyScriptButton">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="icon icon-tabler icons-tabler-outline icon-tabler-box-multiple">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M7 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/>
+                            <path d="M17 17v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2"/>
+                        </svg>
+                        Copy Script
+                    </button>
                 </div>
             </div>
         </div>
@@ -337,5 +352,19 @@
             e.preventDefault();
             addRuleRow();
         });
+
+        // Copy Script
+        document.getElementById('copyScriptButton').addEventListener('click', function() {
+            // Get The Script
+            const scriptText = document.getElementById('generatedScript').textContent;
+
+            // Use the Clipboard to copy
+            navigator.clipboard.writeText(scriptText).then(function() {
+                alert('Script copied to clipboard!');
+            }).catch(function(error) {
+                alert('Failed to copy the script. Please try again.');
+            });
+        });
+
     </script>
 @endpush
