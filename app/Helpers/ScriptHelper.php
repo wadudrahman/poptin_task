@@ -63,7 +63,7 @@ class ScriptHelper
         };
     }
 
-    public function cacheScript(string $userUuid, bool $returnScript = false): null|string
+    public function cacheScript(string $userUuid, bool $returnScript = false): ?string
     {
         // Generate Script
         $generatedScript = $this->generatesScript($userUuid);
@@ -77,5 +77,7 @@ class ScriptHelper
         if ($returnScript) {
             return $generatedScript;
         }
+
+        return null;
     }
 }

@@ -24,7 +24,7 @@ class DynamicScriptController extends Controller
             $script = Cache::get($userUuid);
         } else {
             $scriptHelper = new ScriptHelper();
-            $script = $scriptHelper->cacheScript($userUuid);
+            $script = $scriptHelper->cacheScript($userUuid, true);
         }
 
         return response($script, 200)->header('Content-Type', 'application/javascript');
