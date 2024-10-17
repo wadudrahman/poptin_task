@@ -3,20 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ScriptHelper;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\{JsonResponse, Response};
 use Ramsey\Uuid\Uuid;
 
 class DynamicScriptController extends Controller
 {
-    public function serveDynamicScript(string $userUuid): Response|JsonResponse
+    public function serveDynamicScript(User $user): Response|JsonResponse
     {
-        // Validate UUID
-        if(!Uuid::isValid(trim($userUuid))) {
-            return response()->json([
-                'message' => 'Invalid user uuid given.'
-            ], 400);
-        }
+        // Retrieve User UUID
+        $userUuid = $user->uuid;
 
         // Retrieve Script from Cache; Otherwise from DB
         $script = null;

@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rule::class);
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }
