@@ -12,7 +12,7 @@ class DynamicScriptController extends Controller
     public function serveDynamicScript(string $userUuid): Response|JsonResponse
     {
         // Validate UUID
-        if(!Uuid::isValid(trim($userUuid)) || !Cache::has($userUuid)) {
+        if(!Uuid::isValid(trim($userUuid))) {
             return response()->json([
                 'message' => 'Invalid user uuid given.'
             ], 400);
