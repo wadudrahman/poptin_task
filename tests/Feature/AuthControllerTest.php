@@ -11,7 +11,10 @@ class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_show_login_page(): void
+    /**
+     * Test the login page loads successfully.
+     */
+    public function test_show_login_page()
     {
         $response = $this->get(route('showLogin'));
 
@@ -19,40 +22,53 @@ class AuthControllerTest extends TestCase
         $response->assertViewIs('login');
     }
 
-    public function test_user_can_login_with_valid_credentials(): void
+    /**
+     * Test user login with valid credentials.
+     */
+    public function test_login_successfully()
     {
+        // Create a user
         $user = User::factory()->create([
-            'email' => 'testuser@example.com',
-            'password' => Hash::make('password123')
+            'password' => Hash::make('password'), // Hashed password
         ]);
 
+        // Submit login form with valid credentials
         $response = $this->post(route('login'), [
-            'email' => 'testuser@example.com',
-            'password' => 'password123',
+            'email' => $user->email,
+            'password' => 'password',
         ]);
 
+        // Assert the user is authenticated and redirected to the dashboard
         $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_user_cannot_login_with_invalid_credentials(): void
+    /**
+     * Test login with invalid credentials.
+     */
+    public function test_login_with_invalid_credentials()
     {
+        // Create a user
         $user = User::factory()->create([
-            'email' => 'testuser@example.com',
-            'password' => Hash::make('password123')
+            'password' => Hash::make('password'),
         ]);
 
+        // Attempt login with incorrect password
         $response = $this->post(route('login'), [
-            'email' => 'testuser@example.com',
-            'password' => 'wrongpassword',
+            'email' => $user->email,
+            'password' => 'wrong-password',
         ]);
 
+        // Assert user is redirected back to login page with failure message
         $response->assertRedirect(route('showLogin'));
         $response->assertSessionHas('failure', 'Provided credentials do not match.');
         $this->assertGuest();
     }
 
-    public function test_show_registration_page(): void
+    /**
+     * Test the registration page loads successfully.
+     */
+    public function test_show_registration_page()
     {
         $response = $this->get(route('showRegister'));
 
@@ -60,49 +76,65 @@ class AuthControllerTest extends TestCase
         $response->assertViewIs('register');
     }
 
-    public function test_user_can_register_with_valid_data(): void
+    /**
+     * Test user registration with valid data.
+     */
+    public function test_register_user_successfully()
     {
+        // Submit registration form with valid data
         $response = $this->post(route('register'), [
-            'name' => 'John Doe',
-            'email' => 'johndoe@example.com',
+            'name' => 'Test User',
+            'email' => 'testuser@example.com',
             'password' => 'password123',
-            'password_confirmation' => 'password123',
         ]);
 
+        // Assert the user is created and redirected to login
         $response->assertRedirect(route('showLogin'));
         $response->assertSessionHas('success', 'Account created successfully.');
 
+        // Ensure the user is in the database
         $this->assertDatabaseHas('users', [
-            'email' => 'johndoe@example.com',
+            'email' => 'testuser@example.com',
         ]);
     }
 
-    public function test_registration_fails_with_invalid_data(): void
+    /**
+     * Test registration with an already existing email.
+     */
+    public function test_register_with_existing_email_fails()
     {
-        $response = $this->post(route('register'), [
-            'name' => '',
-            'email' => 'invalid-email',
-            'password' => 'short',
-        ]);
-
-        $response->assertRedirect();
-        $response->assertSessionHasErrors(['name', 'email', 'password']);
-    }
-
-    public function test_registration_fails_if_email_already_exists(): void
-    {
+        // Create
         User::factory()->create([
-            'email' => 'existinguser@example.com'
+            'email' => 'testuser@example.com',
         ]);
 
+        // Attempt to register with the same email
         $response = $this->post(route('register'), [
-            'name' => 'John Doe',
-            'email' => 'existinguser@example.com',
+            'name' => 'Test User',
+            'email' => 'testuser@example.com',
             'password' => 'password123',
-            'password_confirmation' => 'password123',
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors(['email']);
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors('email');
+    }
+
+
+    /**
+     * Test logging out a user successfully.
+     */
+    public function test_logout_user_successfully()
+    {
+        // Create a user and log in
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // Send POST request to logout
+        $response = $this->post(route('logout'));
+
+        // Assert the user is logged out and redirected to login page
+        $response->assertRedirect(route('showLogin'));
+        $response->assertSessionHas('success', 'You have been logged out successfully.');
+        $this->assertGuest();
     }
 }

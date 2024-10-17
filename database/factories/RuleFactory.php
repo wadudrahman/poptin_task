@@ -2,23 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Models\Rule;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Ramsey\Uuid\Uuid;
 
 class RuleFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Rule::class;
+
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(), // Generate a user if not provided
-            'action' => $this->faker->randomElement(['show', 'hide']), // Randomly choose between 'show' or 'hide'
-            'condition' => $this->faker->randomElement(['contains', 'starts_with', 'ends_with', 'exact']), // Random condition
-            'url' => $this->faker->url(), // Generate a random valid URL
+            'uuid' => Uuid::uuid4()->toString(),
+            'action' => 'show',
+            'condition' => 'contains',
+            'url' => $this->faker->slug,
+            'user_id' => null
         ];
     }
 }

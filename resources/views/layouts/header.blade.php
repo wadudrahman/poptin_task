@@ -12,12 +12,21 @@
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
                     <div class="d-none d-xl-block ps-2">
-                        <div>Mohammad Wadud Rahman</div>
-                        <div class="mt-1 small text-secondary">Senior Software Engineer</div>
+                        <div>{!! auth()->user()->name ?? 'Welcome' !!}</div>
+                        <div class="mt-1 small text-secondary">{!! auth()->user()->email !!}</div>
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
+                    <!-- Logout Link -->
+                    <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        Logout
+                    </a>
+
+                    <!-- Hidden Logout Form -->
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+
                 </div>
             </div>
         </div>
